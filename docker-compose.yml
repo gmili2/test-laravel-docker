@@ -1,0 +1,55 @@
+version: "3.9"
+
+networks:
+  laravel:
+
+services:
+  app:
+    build:
+      context: .
+      args:
+        uid: 1000
+    container_name: api-test
+    environment:
+      - APACHE_RUN_USER=#1000
+      - APACHE_RUN_GROUP=#1000
+    ports:
+      - "1000:80"
+    networks:
+      laravel:
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: laravel-test
+    ports:
+      - "1001:${DB_PORT}"
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+    networks:
+      laravel:
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: laravel-phpmyadmin-test
+    links:
+      - db
+    environment:
+      PMA_HOST: ${DB_HOST}
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+      UPLOAD_LIMIT: 500M
+    ports:
+      - "1002:80"
+    networks:
+      - laravel
+    depends_on:
+      - db
