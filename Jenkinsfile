@@ -74,7 +74,7 @@ pipeline {
             }                                  
         }
         always {
-            sh 'sudo docker compose down --remove-orphans -v'
+            sh 'cd docker compose down --remove-orphans -v'
             sh 'docker compose ps'
         }
     }
